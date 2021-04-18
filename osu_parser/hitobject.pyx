@@ -1,14 +1,23 @@
-import math
 import copy
-from osu_parser import mathhelper, curves
+from . import mathhelper
+from . import curves
 
-class SliderTick(object):
+cdef class SliderTick:
+    cdef public float x, y, time
+
     def __init__(self, x, y, time):
         self.x = x
         self.y = y
         self.time = time
 
-class HitObject(object):
+cdef class HitObject(object):
+    cdef public float x, y, time, end_time, pixel_length, tick_distance, duration
+    cdef public int type, repeat
+    cdef public str slider_type
+    cdef public list curve_points, ticks, end_ticks, path
+    cdef public dict timing_point
+    cdef public object difficulty, end
+
     def __init__(self, x, y, time, object_type, slider_type = None, curve_points = None, repeat = 1, pixel_length = 0, timing_point = None, difficulty = None, tick_distance = 1):
         """
         HitObject params for normal hitobject and sliders
@@ -30,6 +39,7 @@ class HitObject(object):
         self.x = x
         self.y = y
         self.time = time
+        self.end_time = 0
         self.type = object_type
 
         #isSlider?
@@ -47,6 +57,8 @@ class HitObject(object):
 
             self.ticks = []
             self.end_ticks = []
+            self.path = []
+            self.end = None
 
             self.calc_slider()
 
